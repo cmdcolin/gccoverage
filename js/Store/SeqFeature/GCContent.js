@@ -14,7 +14,6 @@ function(
 ) {
     return declare(SeqFeatureStore, {
         constructor: function(args) {
-            console.log(args);
             this.store = args.store;
             this.windowSize = args.windowSize;
             this.windowDelta = args.windowDelta;
@@ -34,24 +33,18 @@ function(
                 finishCallback();
                 return;
             }
-            console.log(query)
 
             this.store.getReferenceSequence(query, function(residues) {
-                console.log(residues)
                 for (var i = hw; i < residues.length - hw; i += thisB.windowDelta) {
                     var r = residues.slice(i - hw, i + hw);
-                    var nc = 0;
-                    var ng = 0;
+                    var ngc = 0;
                     for (var j = 0; j < r.length; j++) {
-                        if (r[j] === 'c' || r[j] === 'C') {
-                            nc++;
-                        } else if (r[j] === 'g' || r[j] === 'G') {
-                            ng++;
+                        if (r[j] === 'c' || r[j] === 'C' || r[j] === 'g' || r[j] === 'G') {
+                            ngc++;
                         }
                     }
                     var pos = query.start;
-                    var score;
-                    score = (ng + nc) / r.length;
+                    var score = ngc / r.length;
 
                     var feat = new CoverageFeature({
                         start: pos + i,

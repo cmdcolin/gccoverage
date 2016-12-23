@@ -49,14 +49,16 @@ function (
                 {
                     autoscale: 'local',
                     windowSize: 100,
-                    windowDelta: 10
+                    windowDelta: 10,
+                    style: {
+                        gc_color: 'green'
+                    }
                 }
             );
         },
 
 
         _postDraw: function(scale, leftBase, rightBase, block, canvas, features, featureRects, dataScale) {
-            console.log(leftBase, rightBase)
             var canvasWidth = this._canvasWidth( block );
             var features = [];
             var thisB = this;
@@ -80,15 +82,34 @@ function (
                     }, this );
 
                     var pixels = this._calculatePixelScores( this._canvasWidth(block), features, featureRects );
-                    console.log(pixels)
-                    thisB._drawFeatures( scale, leftBase, rightBase, block, canvas, pixels, thisB.scaling);
+                    thisB._drawGC( scale, leftBase, rightBase, block, canvas, pixels, thisB.scaling);
                 }),
                 dojo.hitch( this, function(e) {
                     console.error( e.stack || ''+e, e );
                     this._handleError( e, args );
                 }));
-        }
+        },
 
+        _drawGC: function( scale, leftBase, rightBase, block, canvas, pixels, dataScale ) {
+            var thisB=this;
+             
+            var context = canvas.getContext('2d');
+            var canvasHeight = canvas.height;
+
+            var ratio = Util.getResolution( context, this.browser.config.highResolutionMode );
+            var toY = dojo.hitch( this, function( val ) {
+               return canvasHeight * ( 1-dataScale.normalize(val) ) / ratio;
+            });
+            var originY = toY( dataScale.origin );
+
+            context.fillStyle = thisB.config.style.gc_color;
+            dojo.forEach( pixels, function(p,i) {
+                if (!p)
+                    return;
+                var score = p['score'];
+                context.fillRect(i, canvasHeight*score, 1, 5);
+            }, this );
+        }
     });
 });
 
