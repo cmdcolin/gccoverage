@@ -14,10 +14,10 @@ function(
 ) {
     return declare(SeqFeatureStore, {
         constructor: function(args) {
+            console.log(args);
             this.store = args.store;
             this.windowSize = args.windowSize;
             this.windowDelta = args.windowDelta;
-            this.gcMode = args.gcMode; // Content, skew
         },
 
         getGlobalStats: function(callback /* , errorCallback */) {
@@ -34,8 +34,10 @@ function(
                 finishCallback();
                 return;
             }
+            console.log(query)
 
             this.store.getReferenceSequence(query, function(residues) {
+                console.log(residues)
                 for (var i = hw; i < residues.length - hw; i += thisB.windowDelta) {
                     var r = residues.slice(i - hw, i + hw);
                     var nc = 0;
@@ -49,11 +51,7 @@ function(
                     }
                     var pos = query.start;
                     var score;
-                    if (thisB.gcMode === 'content') {
-                        score = (ng + nc) / r.length;
-                    } else if (thisB.gcMode === 'skew') {
-                        score = (ng - nc) / (ng + nc);
-                    }
+                    score = (ng + nc) / r.length;
 
                     var feat = new CoverageFeature({
                         start: pos + i,

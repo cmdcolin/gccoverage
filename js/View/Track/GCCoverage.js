@@ -26,6 +26,7 @@ function (
 ) {
     return declare([WiggleBase, YScaleMixin], {
 
+
         constructor: function (args) {
             var thisB = this;
             this.store = new CoverageStore({
@@ -33,7 +34,6 @@ function (
                 browser: this.browser
             });
             this.browser.getStore('refseqs', dojo.hitch(this, function(refSeqStore){
-                console.log('here')
                 
                 thisB.gcStore = new GCContent({
                     store: refSeqStore,
@@ -47,9 +47,46 @@ function (
             return Util.deepUpdate(
                 dojo.clone( this.inherited(arguments) ),
                 {
-                    autoscale: 'local'
+                    autoscale: 'local',
+                    windowSize: 100,
+                    windowDelta: 10
                 }
             );
+        },
+
+
+        _postDraw: function(scale, leftBase, rightBase, block, canvas, features, featureRects, dataScale) {
+            console.log(leftBase, rightBase)
+            var canvasWidth = this._canvasWidth( block );
+            var features = [];
+            var thisB = this;
+                
+            this.gcStore.getFeatures(
+                { ref: this.refSeq.name,
+                  basesPerSpan: 1/scale,
+                  scale: scale,
+                  start: leftBase,
+                  end: rightBase+1
+                },
+
+                function(f) {
+                    if( thisB.filterFeature(f) )
+                        features.push(f);
+                },
+                dojo.hitch( this, function(args) {
+
+                    var featureRects = array.map( features, function(f) {
+                        return this._featureRect( scale, leftBase, canvasWidth, f );
+                    }, this );
+
+                    var pixels = this._calculatePixelScores( this._canvasWidth(block), features, featureRects );
+                    console.log(pixels)
+                    thisB._drawFeatures( scale, leftBase, rightBase, block, canvas, pixels, thisB.scaling);
+                }),
+                dojo.hitch( this, function(e) {
+                    console.error( e.stack || ''+e, e );
+                    this._handleError( e, args );
+                }));
         }
 
     });
