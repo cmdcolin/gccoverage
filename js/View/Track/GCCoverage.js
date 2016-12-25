@@ -51,7 +51,8 @@ function (
                     windowSize: 100,
                     windowDelta: 10,
                     style: {
-                        gc_color: 'green'
+                        gc_color: 'green',
+                        pos_color: 'grey'
                     }
                 }
             );
