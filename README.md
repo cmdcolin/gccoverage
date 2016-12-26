@@ -10,6 +10,7 @@ It's known that GC content influences things like PCR and sequencing, so compari
 ## Screenshot
 
 ![](img/1.png)
+Green shows GC content as perceng of track height, grey is bam file coverage with y-axis scale. Note that this is just sample data, see meren lab blog post for more convincing applications
 
 ## Setup
 
