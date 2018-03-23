@@ -108,7 +108,7 @@ function (
                 if (!p)
                     return;
                 var score = p['score'];
-                context.fillRect(i, canvasHeight*score, 1, 5);
+                context.fillRect(i, canvasHeight*score/ratio, 1, 5);
             }, this );
         }
     });
